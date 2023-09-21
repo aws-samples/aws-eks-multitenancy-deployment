@@ -1,0 +1,39 @@
+{{- range $name, $tenant := .Values.tenants }}
+{{- $groupRules := $tenant.rbac | default list -}}
+{{- range $index, $rule := $groupRules }}
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: readonly-{{ $index }}
+  namespace: {{ $name }}
+  labels:
+    platform.it.vt.edu/ed-group: {{ required "A 'group' is required on all RBAC entries" $rule.group }}
+subjects:
+  - kind: Group
+    name: oidc:{{ $rule.group }}
+    apiGroup: rbac.authorization.k8s.io
+roleRef:
+  kind: ClusterRole
+  name: {{ $.Values.global.clusterRoles.operator }}
+  apiGroup: rbac.authorization.k8s.io
+{{- if $rule.exec }}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: exec-{{ $index }}
+  namespace: {{ $name }}
+  labels:
+    platform.it.vt.edu/ed-group: {{ $rule.group }}
+subjects:
+  - kind: Group
+    name: oidc:{{ $rule.group }}
+    apiGroup: rbac.authorization.k8s.io
+roleRef:
+  kind: ClusterRole
+  name: {{ $.Values.global.clusterRoles.operator }}-exec
+  apiGroup: rbac.authorization.k8s.io
+{{- end }}
+---
+{{- end }}
+{{- end }}

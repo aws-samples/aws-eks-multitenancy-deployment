@@ -1,0 +1,96 @@
+{{- range $name, $tenant := .Values.tenants }}
+{{- if $tenant.monitoringTenant }}
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: prometheus
+  namespace: {{ $name }}
+spec:
+  ingress:
+  - from:
+    - namespaceSelector:
+        matchExpressions:
+          - key: platform.it.vt.edu/purpose
+            operator: NotIn
+            values:
+            - platform-tenant
+  - from:
+    - podSelector: {}
+
+  egress:
+  - to:
+    - namespaceSelector:
+        matchLabels:
+          platform.it.vt.edu/monitoringNamespace: {{ $name }}
+  - to:
+    - namespaceSelector:
+        matchExpressions:
+        - key: platform.it.vt.edu/purpose
+          operator: NotIn
+          values:
+          - platform-tenant
+  - to:
+    - podSelector: {}
+  - to:
+    - ipBlock:
+        cidr: 0.0.0.0/0
+  podSelector: {}
+  policyTypes:
+  - Ingress
+  - Egress
+
+{{ else if ne $.Values.global.flux.tenantCloneBaseUrl "ssh://git@code.vt.edu/it-common-platform/tenants/eksa-dvlp/" }}
+apiVersion: "cilium.io/v2"
+kind: CiliumNetworkPolicy
+metadata:
+  name: "ingressdeny-other-tenants-and-allow-cluster-traffic"
+  namespace: {{ $name }}
+spec:
+  endpointSelector: {}
+  ingress:
+  - fromEndpoints:
+    - {}
+  - fromEntities:
+    - cluster
+  ingressDeny:
+  - fromEndpoints:
+    - matchExpressions:
+      - key: k8s:io.cilium.k8s.namespace.labels.platform.it.vt.edu/purpose
+        operator: In
+        values:
+          - platform-tenant
+      - key: k8s:io.kubernetes.pod.namespace
+        operator: NotIn
+        values:
+          - {{ $name }}
+          {{- if $tenant.monitoringNamespace }}
+          - {{ $tenant.monitoringNamespace }}
+          {{- end }}
+---
+apiVersion: "cilium.io/v2"
+kind: CiliumNetworkPolicy
+metadata:
+  name: "egressdeny-other-tenants-and-allow-all-traffic"
+  namespace: {{ $name }}
+spec:
+  endpointSelector: {}
+  egress:
+  - toEntities:
+    - all
+  egressDeny:
+  - toEndpoints:
+    - matchExpressions:
+      - key: k8s:io.cilium.k8s.namespace.labels.platform.it.vt.edu/purpose
+        operator: In
+        values:
+          - platform-tenant
+      - key: k8s:io.kubernetes.pod.namespace
+        operator: NotIn
+        values:
+          - {{ $name }}
+          {{- if $tenant.monitoringNamespace }}
+          - {{ $tenant.monitoringNamespace }}
+          {{- end }}
+{{- end }}
+---
+{{- end }}

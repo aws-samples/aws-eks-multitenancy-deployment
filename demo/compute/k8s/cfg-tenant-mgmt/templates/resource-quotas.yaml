@@ -1,0 +1,14 @@
+{{- range $name, $tenant := .Values.tenants }}
+{{- if $tenant.quotas }}
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: cpu-memory-resource-quota-limit
+  namespace: {{ $name }}
+spec:
+  hard:
+    limits.cpu: {{ $tenant.quotas.limits.cpu | quote }}
+    limits.memory: {{ $tenant.quotas.limits.memory | quote }}
+---
+{{- end }}
+{{- end }}

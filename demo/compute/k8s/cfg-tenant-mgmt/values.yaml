@@ -1,0 +1,23 @@
+global:
+  clusterRoles:
+    operator: platform-tenant
+    flux: flux-tenant-applier
+  flux:
+    tenantCloneBaseUrl: ${TEANT_BASE_URL}
+    repoSecret: "${TENANT_REPO_SECRET}"
+
+tenants:
+  tenant-1:
+    quotas:
+      limits:
+        cpu: 1 #max value for the sum of cpu resource limits in the namespace
+        memory: 1Gi #max value for the sum of memory resource limits in the namespace
+    flux:
+     path: overlays/tenant-1
+  tenant-2:
+    quotas:
+      limits:
+        cpu: 1 #max value for the sum of cpu resource limits in the namespace
+        memory: 2Gi #max value for the sum of memory resource limits in the namespace
+    flux:
+     path: overlays/tenant-2

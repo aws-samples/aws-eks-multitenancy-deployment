@@ -1,0 +1,56 @@
+{{- range $name, $tenant := .Values.tenants }}
+{{- $flux := $tenant.flux | default dict }}
+---
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: GitRepository
+metadata:
+  name: {{ $name }}
+  namespace: platform-flux-tenant-config
+spec:
+  interval: 5m
+  {{- if $tenant.globalUrl }}
+  url: {{ $tenant.globalUrl }}
+  {{- else }}
+  url: {{ $.Values.global.flux.tenantCloneBaseUrl }}
+  {{- end }}
+  secretRef:
+    name: {{ $.Values.global.flux.repoSecret }}
+  ref:
+    branch: {{ default "main" $flux.branch }}
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: flux
+  namespace: {{ $name }}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: flux-rb
+  namespace: {{ $name }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: {{ $.Values.global.clusterRoles.flux }}
+subjects:
+  - name: flux
+    namespace: {{ $name }}
+    kind: ServiceAccount
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: {{ $name }}
+  namespace: {{ $name }}
+spec:
+  interval: 10m
+  path: {{ default "./" $flux.path  }}
+  prune: true
+  serviceAccountName: flux
+  targetNamespace: {{ $name }}
+  sourceRef:
+    kind: GitRepository
+    name: {{ $name }}
+    namespace: platform-flux-tenant-config
+{{- end }}

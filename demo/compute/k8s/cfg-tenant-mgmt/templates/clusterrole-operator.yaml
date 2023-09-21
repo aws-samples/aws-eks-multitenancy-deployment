@@ -1,0 +1,258 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: {{ $.Values.global.clusterRoles.operator }}
+rules:
+  # Allow access to view HelmReleases
+  - apiGroups:
+      - helm.fluxcd.io
+      - helm.toolkit.fluxcd.io
+    resources:
+      - helmreleases
+    verbs:
+      - get
+      - list
+      - watch
+
+  # Allow access to view Kustomizations
+  - apiGroups:
+      - kustomize.toolkit.fluxcd.io
+    resources:
+      - kustomizations
+    verbs:
+      - get
+      - list
+      - watch
+
+  # Allow access to view GitRepositories
+  - apiGroups:
+      - source.toolkit.fluxcd.io
+    resources:
+      - gitrepositories
+      - helmcharts
+      - helmrepositories
+    verbs:
+      - get
+      - list
+      - watch
+
+  # Allow access to the pod-related metrics
+  - apiGroups:
+      - metrics.k8s.io
+    resources:
+      - pods
+    verbs:
+      - get
+      - list
+      - watch
+
+  # Allow access to trivy reports
+  - apiGroups:
+      - aquasecurity.github.io
+    resources:
+      - configauditreports
+      - exposedsecretreports
+      - rbacassessmentreports
+      - vulnerabilityreports
+    verbs:
+      - get
+      - list
+      - watch
+
+  # Allow access to traefik resources
+  - apiGroups:
+      - traefik.containo.us
+      - traefik.io
+    resources:
+      - ingressroutes
+      - ingressroutetcps
+      - ingressrouteudps
+      - middlewares
+      - middlewaretcps
+      - serverstransports
+      - tlsoptions
+      - tlsstores
+    verbs:
+      - get
+      - list
+      - watch
+
+  # Allow access to prometheus resources
+  - apiGroups:
+      - monitoring.coreos.com
+    resources:
+      - alertmanagerconfigs
+      - alertmanagers
+      - podmonitors
+      - probes
+      - prometheuses
+      - prometheusrules
+      - servicemonitors
+      - thanosrulers
+    verbs:
+      - get
+      - list
+      - watch
+
+  # Allow access to karpenter provisioner resources
+  - apiGroups:
+      - karpenter.sh
+    resources:
+      - provisioners
+    verbs:
+      - get
+      - list
+      - watch    
+
+  # Allow access to list nodes
+  - apiGroups:
+      - ""
+    resources:
+      - nodes
+    verbs:
+      - get
+      - list
+      - watch
+
+  # The default system-level "view" ClusterRole is below
+  - apiGroups:
+    - certmanager.k8s.io
+    - cert-manager.io
+    resources:
+    - certificates
+    - certificaterequests
+    verbs:
+    - get
+    - list
+    - watch
+  - apiGroups:
+    - ""
+    resources:
+    - configmaps
+    - endpoints
+    - persistentvolumeclaims
+    - persistentvolumeclaims/status
+    - pods
+    - replicationcontrollers
+    - replicationcontrollers/scale
+    - serviceaccounts
+    - services
+    - services/status
+    verbs:
+    - get
+    - list
+    - watch
+  - apiGroups:
+    - ""
+    resources:
+    - bindings
+    - events
+    - limitranges
+    - namespaces/status
+    - pods/log
+    - pods/status
+    - replicationcontrollers/status
+    - resourcequotas
+    - resourcequotas/status
+    verbs:
+    - get
+    - list
+    - watch
+  - apiGroups:
+    - ""
+    resources:
+    - namespaces
+    verbs:
+    - get
+    - list
+    - watch
+  - apiGroups:
+    - apps
+    resources:
+    - controllerrevisions
+    - daemonsets
+    - daemonsets/status
+    - deployments
+    - deployments/scale
+    - deployments/status
+    - replicasets
+    - replicasets/scale
+    - replicasets/status
+    - statefulsets
+    - statefulsets/scale
+    - statefulsets/status
+    verbs:
+    - get
+    - list
+    - watch
+  - apiGroups:
+    - autoscaling
+    resources:
+    - horizontalpodautoscalers
+    - horizontalpodautoscalers/status
+    verbs:
+    - get
+    - list
+    - watch
+  - apiGroups:
+    - batch
+    resources:
+    - cronjobs
+    - cronjobs/status
+    - jobs
+    - jobs/status
+    verbs:
+    - get
+    - list
+    - watch
+  - apiGroups:
+    - extensions
+    resources:
+    - daemonsets
+    - daemonsets/status
+    - deployments
+    - deployments/scale
+    - deployments/status
+    - ingresses
+    - ingresses/status
+    - networkpolicies
+    - replicasets
+    - replicasets/scale
+    - replicasets/status
+    - replicationcontrollers/scale
+    verbs:
+    - get
+    - list
+    - watch
+  - apiGroups:
+    - policy
+    resources:
+    - poddisruptionbudgets
+    - poddisruptionbudgets/status
+    verbs:
+    - get
+    - list
+    - watch
+  - apiGroups:
+    - networking.k8s.io
+    resources:
+    - ingresses
+    - ingresses/status
+    - networkpolicies
+    verbs:
+    - get
+    - list
+    - watch
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: {{ $.Values.global.clusterRoles.flux }}
+rules:
+  - apiGroups:
+      - '*'
+    resources:
+      - '*'
+    verbs:
+      - '*'
+---
