@@ -10,7 +10,7 @@ spec:
   - from:
     - namespaceSelector:
         matchExpressions:
-          - key: platform.it.vt.edu/purpose
+          - key: purpose
             operator: NotIn
             values:
             - platform-tenant
@@ -21,11 +21,11 @@ spec:
   - to:
     - namespaceSelector:
         matchLabels:
-          platform.it.vt.edu/monitoringNamespace: {{ $name }}
+          monitoringNamespace: {{ $name }}
   - to:
     - namespaceSelector:
         matchExpressions:
-        - key: platform.it.vt.edu/purpose
+        - key: purpose
           operator: NotIn
           values:
           - platform-tenant
@@ -55,7 +55,7 @@ spec:
   ingressDeny:
   - fromEndpoints:
     - matchExpressions:
-      - key: k8s:io.cilium.k8s.namespace.labels.platform.it.vt.edu/purpose
+      - key: k8s:io.cilium.k8s.namespace.labels.purpose
         operator: In
         values:
           - platform-tenant
@@ -80,7 +80,7 @@ spec:
   egressDeny:
   - toEndpoints:
     - matchExpressions:
-      - key: k8s:io.cilium.k8s.namespace.labels.platform.it.vt.edu/purpose
+      - key: k8s:io.cilium.k8s.namespace.labels.purpose
         operator: In
         values:
           - platform-tenant
