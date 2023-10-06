@@ -7,7 +7,7 @@ metadata:
   name: readonly-{{ $index }}
   namespace: {{ $name }}
   labels:
-    platform.it.vt.edu/ed-group: {{ required "A 'group' is required on all RBAC entries" $rule.group }}
+    ed-group: {{ required "A 'group' is required on all RBAC entries" $rule.group }}
 subjects:
   - kind: Group
     name: oidc:{{ $rule.group }}
@@ -24,7 +24,7 @@ metadata:
   name: exec-{{ $index }}
   namespace: {{ $name }}
   labels:
-    platform.it.vt.edu/ed-group: {{ $rule.group }}
+    ed-group: {{ $rule.group }}
 subjects:
   - kind: Group
     name: oidc:{{ $rule.group }}
