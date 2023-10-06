@@ -4,12 +4,12 @@ kind: Namespace
 metadata:
   name: {{ $name }}
   labels:
-    platform.it.vt.edu/purpose: platform-tenant
+    purpose: platform-tenant
     {{- if $tenant.monitoringNamespace }}
-    platform.it.vt.edu/monitoringNamespace: {{ $tenant.monitoringNamespace }}
+    monitoringNamespace: {{ $tenant.monitoringNamespace }}
     {{- end }}
     {{- if $tenant.nodePool }}
-    platform.it.vt.edu/node-pool: {{ $tenant.nodePool }}
+    node-pool: {{ $tenant.nodePool }}
     {{- end }}
     {{- if $tenant.labels }}
     {{- $tenantLabels := $tenant.labels }}
@@ -21,17 +21,17 @@ metadata:
     {{- end }}{{/* end $tenant.annotations */}}
   {{- if $tenant.contacts }}
     {{- range $i, $val := $tenant.contacts }}
-    platform.it.vt.edu/tenant-contact-{{ $i }}: {{ printf "[%s] %s<%s>" $val.type $val.name $val.email | quote }}
+    tenant-contact-{{ $i }}: {{ printf "[%s] %s<%s>" $val.type $val.name $val.email | quote }}
     {{- end }} {{/* end single contact */}}
   {{- end }} {{/* end $tenant.contacts annotation */}}
   {{- if $tenant.data }}
-    platform.it.vt.edu/data-classification: {{ $tenant.data.classification | default "low-risk" }}
-    platform.it.vt.edu/data-kinds: {{ join "," $tenant.data.dataKinds | default "none" }}
-    platform.it.vt.edu/data-description: {{ $tenant.data.description | quote | default "unknown" }}
+    data-classification: {{ $tenant.data.classification | default "low-risk" }}
+    data-kinds: {{ join "," $tenant.data.dataKinds | default "none" }}
+    data-description: {{ $tenant.data.description | quote | default "unknown" }}
   {{- end }} {{/* end $tenant.data annotation */}}
   {{- if $tenant.criticality }}
-    platform.it.vt.edu/tenant-critical-to: {{ $tenant.criticality.criticalTo | default "none" }}
-    platform.it.vt.edu/tenant-critical-description: {{ $tenant.criticality.description | quote | default "none" }}
+    tenant-critical-to: {{ $tenant.criticality.criticalTo | default "none" }}
+    tenant-critical-description: {{ $tenant.criticality.description | quote | default "none" }}
   {{- end }} {{/* $tenant.criticality annotation */}}
 ---
 {{- end }} {{/* range tenants */}}
