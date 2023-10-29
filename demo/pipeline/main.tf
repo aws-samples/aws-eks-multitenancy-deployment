@@ -108,4 +108,3 @@ module "codepipeline_terraform" {
     Region       = local.region
   }
 }
-

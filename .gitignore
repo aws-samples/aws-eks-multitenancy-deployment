@@ -1,0 +1,50 @@
+# Terraform .terraform directory
+.terraform/
+
+# Local .terraform directories
+**/.terraform/
+
+# Crash log files
+crash.log
+
+# Exclude the .tfstate file
+*.tfstate
+
+# Exclude the .tfstate files for all non-default workspaces
+*.tfstate.d
+
+# Exclude the CLI configuration file
+terraform.rc
+
+# Exclude the provider lock file
+.terraform.lock.hcl
+
+# Exclude the private key files
+*.pem
+
+# Exclude the public key files
+*.pub
+
+# Include override files as they should be committed to make it work on different environments
+!override.tf
+!override.tf.json
+
+# Include a .terraformrc file to validate that the CLI
+# configuration is correctly stated for every workspace
+!.terraformrc
+
+# Include AWS provider config to verify that AWS config
+# is correctly set for every workspace
+!terraformrc
+
+# Exclude CLI argument files
+.terraform-version
+
+# Exclude local provider binaries
+terraform-provider-*
+
+# Exclude log files
+*.log
+
+# Exclude tfapply files
+tfapply

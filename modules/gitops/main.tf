@@ -1,10 +1,10 @@
 resource "aws_codecommit_repository" "gitops" {
-  repository_name = "cfg-multi-tenancy-apps"
-  description     = "CodeCommit repository for hosting tenant apps"
+  repository_name = var.repository_name
+  description     = var.repository_description
 }
 
 resource "aws_iam_user" "gitops" {
-  name = "fluxcd"
+  name = var.iam_user_name
   path = "/"
 }
 
@@ -46,25 +46,30 @@ resource "aws_kms_key" "secrets" {
   enable_key_rotation = true
 }
 
+resource "kubernetes_namespace" "platform_flux_tenant_config" {
+  metadata {
+    name = "platform-flux-tenant-config"
+  }
+}
+
 resource "kubectl_manifest" "cluster_secretstore" {
-  yaml_body  = <<YAML
+  yaml_body = <<YAML
 apiVersion: external-secrets.io/v1beta1
 kind: ClusterSecretStore
 metadata:
-  name: ${local.cluster_secretstore_name}
-  namespace: platform-flux-tenant-config
+  name: ${var.cluster_secretstore_name}
+  namespace: ${kubernetes_namespace.platform_flux_tenant_config.metadata[0].name}
 spec:
   provider:
     aws:
       service: SecretsManager
-      region: ${local.region}
+      region: ${var.region}
       auth:
         jwt:
           serviceAccountRef:
-            name: ${local.cluster_secretstore_sa}
+            name: ${var.cluster_secretstore_sa}
             namespace: external-secrets
 YAML
-  depends_on = [module.eks_blueprints_addons]
 }
 
 resource "aws_secretsmanager_secret" "secret" {
@@ -72,11 +77,10 @@ resource "aws_secretsmanager_secret" "secret" {
   kms_key_id              = aws_kms_key.secrets.arn
 }
 
-
 module "generate_known_hosts" {
   source = "matti/resource/shell"
 
-  command = "ssh-keyscan -H git-codecommit.${local.region}.amazonaws.com"
+  command = "ssh-keyscan -H git-codecommit.${var.region}.amazonaws.com"
 }
 
 resource "aws_secretsmanager_secret_version" "secret" {
@@ -93,19 +97,19 @@ resource "kubectl_manifest" "secret" {
 apiVersion: external-secrets.io/v1beta1
 kind: ExternalSecret
 metadata:
-  name: ${local.cluster_name}-sm
-  namespace: platform-flux-tenant-config
+  name: ${var.cluster_name}-sm
+  namespace: ${kubernetes_namespace.platform_flux_tenant_config.metadata[0].name}
 spec:
-  refreshInterval: 10m
-  secretStoreRef:
-    name: ${local.cluster_secretstore_name}
-    kind: ClusterSecretStore
-  target:
-    name: ${local.cluster_name}-sm
-    creationPolicy: Owner
-  dataFrom:
-  - extract:
-      key: ${aws_secretsmanager_secret.secret.name}
+    refreshInterval: 10m
+    secretStoreRef:
+        name: ${var.cluster_secretstore_name}
+        kind: ClusterSecretStore
+    target:
+        name: ${var.cluster_name}-sm
+        creationPolicy: Owner
+    dataFrom:
+        - extract:
+              key: ${aws_secretsmanager_secret.secret.name}
 YAML
   depends_on = [kubectl_manifest.cluster_secretstore]
 }

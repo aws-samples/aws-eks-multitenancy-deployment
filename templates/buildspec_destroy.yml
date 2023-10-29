@@ -3,6 +3,8 @@ version: 0.2
 env:
   variables:
     CODE_SRC_DIR: "."
+
+    # Terraform related variables
     TF_VERSION: "1.4.6"
     TF_MODULE_TO_BUILD: "network"
     ENVIRONMENT: "demo"
@@ -12,6 +14,9 @@ phases:
     runtime-versions:
       python: 3.9
     commands:
+      - set -e
+      # Install Terraform
+      - "echo Installing Terraform..."
       - "curl -s -qL -o terraform.zip https://releases.hashicorp.com/terraform/${TF_VERSION}/terraform_${TF_VERSION}_linux_amd64.zip"
       - "unzip -o terraform.zip"
       - "mv terraform /bin"
@@ -19,7 +24,10 @@ phases:
 
   build:
     commands:
+      - set -e
+      - "echo ## TERRAFORM DESTROY : Initiating Terraform Destroy"
       - "/bin/bash ${CODEBUILD_SRC_DIR}/run.sh -m ${TF_MODULE_TO_BUILD} -env ${ENVIRONMENT} -region ${AWS_REGION} -tfcmd destroy"
+
 artifacts:
   files:
     - '**/*'

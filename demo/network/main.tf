@@ -91,16 +91,21 @@ module "tgw" {
   # When "true" there is no need for RAM resources if using multiple AWS accounts
   enable_auto_accept_shared_attachments = true
 
+  timeouts = {
+    create = "10m" # Increase the create timeout to 10 minutes
+  }
+
   transit_gateway_cidr_blocks = ["10.99.0.0/24"]
   # When "true", allows service discovery through IGMP
   enable_mutlicast_support = false
 
   vpc_attachments = {
     tenant_vpc1 = {
-      vpc_id       = module.tenant_vpc1.vpc_id
-      subnet_ids   = module.tenant_vpc1.private_subnet_ids
-      dns_support  = true
-      ipv6_support = false
+      vpc_id                                          = module.tenant_vpc1.vpc_id
+      subnet_ids                                      = module.tenant_vpc1.private_subnet_ids
+      transit_gateway_default_route_table_propagation = true
+      dns_support                                     = true
+      ipv6_support                                    = false
 
       tgw_routes = [
         {
@@ -109,9 +114,10 @@ module "tgw" {
       ]
     },
     tenant_vpc2 = {
-      vpc_id      = module.tenant_vpc2.vpc_id
-      subnet_ids  = module.tenant_vpc2.private_subnet_ids
-      dns_support = true
+      vpc_id                                          = module.tenant_vpc2.vpc_id
+      subnet_ids                                      = module.tenant_vpc2.private_subnet_ids
+      transit_gateway_default_route_table_propagation = true
+      dns_support                                     = true
 
       tgw_routes = [
         {
@@ -120,9 +126,10 @@ module "tgw" {
       ]
     },
     eks_vpc = {
-      vpc_id      = module.eks_vpc.vpc_id
-      subnet_ids  = module.eks_vpc.private_subnet_ids
-      dns_support = true
+      vpc_id                                          = module.eks_vpc.vpc_id
+      subnet_ids                                      = module.eks_vpc.private_subnet_ids
+      transit_gateway_default_route_table_propagation = true
+      dns_support                                     = true
 
       tgw_routes = [
         {
@@ -131,9 +138,10 @@ module "tgw" {
       ]
     },
     eks_egress_vpc = {
-      vpc_id      = module.eks_egress_vpc.vpc_id
-      subnet_ids  = module.eks_egress_vpc.private_subnet_ids
-      dns_support = true
+      vpc_id                                          = module.eks_egress_vpc.vpc_id
+      subnet_ids                                      = module.eks_egress_vpc.private_subnet_ids
+      transit_gateway_default_route_table_propagation = true
+      dns_support                                     = true
 
       tgw_routes = [
         {
@@ -141,7 +149,7 @@ module "tgw" {
         },
         {
           destination_cidr_block = "0.0.0.0/0"
-        },
+        }
       ]
     }
   }

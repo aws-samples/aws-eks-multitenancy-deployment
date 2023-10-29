@@ -58,9 +58,21 @@ module "eks_blueprints_addons" {
   }
 }
 
+module "gitops" {
+  depends_on = [module.eks, module.eks_blueprints_addons]
+  source     = "../../modules/gitops"
+
+  repository_name          = "cfg-multi-tenancy-apps"
+  repository_description   = "CodeCommit repository for hosting tenant apps"
+  iam_user_name            = "fluxcd"
+  cluster_secretstore_name = local.cluster_secretstore_name
+  region                   = local.region
+  cluster_secretstore_sa   = local.cluster_secretstore_sa
+  cluster_name             = local.cluster_name
+}
 
 module "fluxcd" {
-  depends_on = [module.eks_blueprints_addons]
+  depends_on = [module.eks_blueprints_addons, module.gitops]
   source     = "terraform-module/release/helm"
   version    = "2.8.0"
 
@@ -125,21 +137,21 @@ module "tenant_mgmt" {
   source     = "terraform-module/release/helm"
   version    = "2.8.0"
 
-  namespace  = "platform-flux-tenant-config"
+  namespace  = module.gitops.platform_namespace_name
   repository = "local"
 
   app = {
     name             = "cfg-tenant-mgmt"
     version          = "0.1.0"
-    chart            = "./k8s/cfg-tenant-mgmt"
+    chart            = "${path.module}/k8s/cfg-tenant-mgmt"
     force_update     = true
     create_namespace = true
     wait             = false
     recreate_pods    = false
     deploy           = 1
   }
-  values = [templatefile("./k8s/cfg-tenant-mgmt/values.yaml", {
-    TEANT_BASE_URL     = "ssh://${aws_iam_user_ssh_key.gitops.ssh_public_key_id}@git-codecommit.${local.region}.amazonaws.com/v1/repos/${aws_codecommit_repository.gitops.repository_name}"
+  values = [templatefile("${path.module}/k8s/cfg-tenant-mgmt/values.yaml", {
+    TEANT_BASE_URL     = "ssh://${module.gitops.aws_ssh_public_key_id}@git-codecommit.${local.region}.amazonaws.com/v1/repos/${module.gitops.codecommit_repository_arn}"
     TENANT_REPO_SECRET = "${local.cluster_name}-sm"
   })]
 }
