@@ -4,7 +4,7 @@ resource "aws_subnet" "public_subnet" {
   count                           = length(var.public_subnets_cidr)
   cidr_block                      = element(var.public_subnets_cidr, count.index)
   availability_zone               = element(var.availability_zones, count.index)
-  map_public_ip_on_launch         = true
+  map_public_ip_on_launch         = false
   ipv6_native                     = false ## Indicates whether to create an IPv6-only subnet
   assign_ipv6_address_on_creation = false ## Specify true to indicate that network interfaces created in the specified subnet should be assigned an IPv6 address.
   tags = {
