@@ -146,11 +146,16 @@ module "tgw" {
       tgw_routes = [
         {
           destination_cidr_block = local.eks_egress_cidr
-        },
-        {
-          destination_cidr_block = "0.0.0.0/0"
         }
       ]
     }
   }
+}
+
+resource "aws_ec2_transit_gateway_route" "route_to_internet" {
+  transit_gateway_route_table_id = module.tgw.ec2_transit_gateway_propagation_default_route_table_id
+  destination_cidr_block         = "0.0.0.0/0"
+  transit_gateway_attachment_id  = module.tgw.ec2_transit_gateway_vpc_attachment_ids[0]
+
+  depends_on = [module.tgw]
 }
