@@ -16,10 +16,6 @@ terraform {
       source  = "gavinbunney/kubectl"
       version = ">= 1.14"
     }
-    external = {
-      source  = "hashicorp/external"
-      version = "2.3.1"
-    }
   }
   backend "s3" {
   }
@@ -66,8 +62,4 @@ provider "kubectl" {
     # This requires the awscli to be installed locally where Terraform is executed
     args = ["eks", "get-token", "--cluster-name", module.eks.cluster_name]
   }
-}
-
-provider "external" {
-  # Configuration options
 }

@@ -1,34 +1,47 @@
-## Terraform Configuration
+<!-- BEGIN_TF_DOCS -->
+## Requirements
 
-### Providers
+| Name | Version |
+|------|---------|
+| <a name="requirement_aws"></a> [aws](#requirement\_aws) | >= 4.47 |
+| <a name="requirement_helm"></a> [helm](#requirement\_helm) | >= 2.8.0 |
+| <a name="requirement_kubectl"></a> [kubectl](#requirement\_kubectl) | >= 1.14 |
+| <a name="requirement_kubernetes"></a> [kubernetes](#requirement\_kubernetes) | >= 2.10 |
 
-| Provider | Version |
-|---|---|
-| aws | `>= 4.47` |
-| kubernetes | `>= 2.10` |
-| helm | `>= 2.8.0` |
-| kubectl | `>= 1.14` |
-| external | `2.3.1` |
+## Providers
 
-### Modules
+| Name | Version |
+|------|---------|
+| <a name="provider_aws"></a> [aws](#provider\_aws) | >= 4.47 |
+| <a name="provider_terraform"></a> [terraform](#provider\_terraform) | n/a |
 
-| Module Name | Source | Version |
-|---|---|---|
-| eks | `terraform-aws-modules/eks/aws` | `~> 19.12` |
-| eks_blueprints_addons | `aws-ia/eks-blueprints-addons/aws` | `~> 1.0` |
-| fluxcd | `terraform-module/release/helm` | `2.9.0` |
-| cilium | `terraform-module/release/helm` | `1.14.0-snapshot.3` |
-| tenant_mgmt | `terraform-module/release/helm` | `0.1.0` |
-| gitops | `../../modules/gitops` | `0.1` |
+## Modules
 
-### Inputs
+| Name | Source | Version |
+|------|--------|---------|
+| <a name="module_cilium"></a> [cilium](#module\_cilium) | terraform-module/release/helm | 2.8.0 |
+| <a name="module_eks"></a> [eks](#module\_eks) | terraform-aws-modules/eks/aws | ~> 19.12 |
+| <a name="module_eks_blueprints_addons"></a> [eks\_blueprints\_addons](#module\_eks\_blueprints\_addons) | aws-ia/eks-blueprints-addons/aws | ~> 1.0 |
+| <a name="module_fluxcd"></a> [fluxcd](#module\_fluxcd) | terraform-module/release/helm | 2.8.0 |
+| <a name="module_gitops"></a> [gitops](#module\_gitops) | ../../modules/gitops | n/a |
+| <a name="module_tenant_mgmt"></a> [tenant\_mgmt](#module\_tenant\_mgmt) | terraform-module/release/helm | 2.8.0 |
 
-| Input Variable | Description |
-|---|---|
-| `environment` | `Environment to deploy the resources. This value is fetched from run.sh script` |
+## Resources
 
-### Outputs
+| Name | Type |
+|------|------|
+| [aws_caller_identity.current](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/caller_identity) | data source |
+| [aws_region.current](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/region) | data source |
+| [terraform_remote_state.network](https://registry.terraform.io/providers/hashicorp/terraform/latest/docs/data-sources/remote_state) | data source |
+| [terraform_remote_state.pipeline](https://registry.terraform.io/providers/hashicorp/terraform/latest/docs/data-sources/remote_state) | data source |
 
-| Output Variable | Description |
-|---|---|
-_No outputs defined._
+## Inputs
+
+| Name | Description | Type | Default | Required |
+|------|-------------|------|---------|:--------:|
+| <a name="input_environment"></a> [environment](#input\_environment) | Environment to deploy the resources. This value is fetched from run.sh script | `string` | `""` | no |
+
+## Outputs
+
+No outputs.
+<!-- END_TF_DOCS -->

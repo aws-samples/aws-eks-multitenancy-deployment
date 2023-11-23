@@ -1,39 +1,53 @@
-## Terraform Configuration
+<!-- BEGIN_TF_DOCS -->
+## Requirements
 
-### Providers
+| Name | Version |
+|------|---------|
+| <a name="requirement_aws"></a> [aws](#requirement\_aws) | ~> 4.0 |
 
-| Provider | Version |
-|---|---|
-| aws | `~> 4.0` |
+## Providers
 
-### Modules
+| Name | Version |
+|------|---------|
+| <a name="provider_aws"></a> [aws](#provider\_aws) | ~> 4.0 |
 
-| Module Name | Source | Version |
-|---|---|---|
-| gitops | `../../modules/gitops` | `0.1` |
-| tenant_vpc1 | `../../modules/vpc` | `0.1` |
-| tenant_vpc2 | `../../modules/vpc` | `0.1` |
-| eks_vpc | `../../modules/vpc` | `0.1` |
-| eks_egress_vpc | `../../modules/vpc` | `0.1` |
-| tgw | `../../modules/transit_gw` | `0.1` |
+## Modules
 
-### Inputs
+| Name | Source | Version |
+|------|--------|---------|
+| <a name="module_eks_egress_vpc"></a> [eks\_egress\_vpc](#module\_eks\_egress\_vpc) | ../../modules/vpc | n/a |
+| <a name="module_eks_vpc"></a> [eks\_vpc](#module\_eks\_vpc) | ../../modules/vpc | n/a |
+| <a name="module_tenant_vpc1"></a> [tenant\_vpc1](#module\_tenant\_vpc1) | ../../modules/vpc | n/a |
+| <a name="module_tenant_vpc2"></a> [tenant\_vpc2](#module\_tenant\_vpc2) | ../../modules/vpc | n/a |
+| <a name="module_tgw"></a> [tgw](#module\_tgw) | ../../modules/transit_gw | n/a |
 
-| Input Variable | Description |
-|---|---|
-| `environment` | `Environment to deploy the resources. This value is fetched from run.sh script` |
+## Resources
 
-### Outputs
+| Name | Type |
+|------|------|
+| [aws_ec2_transit_gateway_route.route_to_internet](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ec2_transit_gateway_route) | resource |
+| [aws_availability_zones.available](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/availability_zones) | data source |
+| [aws_caller_identity.current](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/caller_identity) | data source |
+| [aws_region.current](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/region) | data source |
 
-| Output Variable | Description |
-|---|---|
-| `tenant2_vpc_cidr_block` | `Tenant2 vpc cidr block` |
-| `tenant1_vpc_cidr_block` | `Tenant1 vpc cidr block` |
-| `eks_vpc_vpc_id` | `Eks vpc_id` |
-| `eks_vpc_private_subnet_ids` | `Eks vpc private subnet ids` |
-| `eks_egress_vpc_private_subnet_ids` | `Eks egress vpc private subnet ids` |
-| `eks_egress_vpc_vpc_id` | `Eks egress vpc id` |
-| `eks_vpc_cidr_block` | `Eks vpc cidr block` |
-| `eks_egress_vpc_public_subnet_ids` | `Eks egress vpc public subnet ids` |
-| `eks_egress_vpc_cidr_block` | `Eks egress vpc cidr block` |
-| `tenant1_vpc_private_subnet_ids` | `Tenant1 vpc private subnet ids` |
+## Inputs
+
+| Name | Description | Type | Default | Required |
+|------|-------------|------|---------|:--------:|
+| <a name="input_environment"></a> [environment](#input\_environment) | Environment to deploy the resources. This value is fetched from run.sh script | `string` | `""` | no |
+
+## Outputs
+
+| Name | Description |
+|------|-------------|
+| <a name="output_eks_egress_vpc_cidr_block"></a> [eks\_egress\_vpc\_cidr\_block](#output\_eks\_egress\_vpc\_cidr\_block) | The CIDR block associated with the EKS Egress VPC. |
+| <a name="output_eks_egress_vpc_private_subnet_ids"></a> [eks\_egress\_vpc\_private\_subnet\_ids](#output\_eks\_egress\_vpc\_private\_subnet\_ids) | List of IDs for the private subnets within the EKS Egress VPC. |
+| <a name="output_eks_egress_vpc_public_subnet_ids"></a> [eks\_egress\_vpc\_public\_subnet\_ids](#output\_eks\_egress\_vpc\_public\_subnet\_ids) | List of IDs for the public subnets within the EKS Egress VPC. |
+| <a name="output_eks_egress_vpc_vpc_id"></a> [eks\_egress\_vpc\_vpc\_id](#output\_eks\_egress\_vpc\_vpc\_id) | The unique identifier of the Egress VPC created for the EKS cluster. |
+| <a name="output_eks_vpc_cidr_block"></a> [eks\_vpc\_cidr\_block](#output\_eks\_vpc\_cidr\_block) | The CIDR block associated with the EKS VPC. |
+| <a name="output_eks_vpc_private_subnet_ids"></a> [eks\_vpc\_private\_subnet\_ids](#output\_eks\_vpc\_private\_subnet\_ids) | List of IDs for the private subnets within the EKS VPC. |
+| <a name="output_eks_vpc_vpc_id"></a> [eks\_vpc\_vpc\_id](#output\_eks\_vpc\_vpc\_id) | The unique identifier of the VPC created for the EKS cluster. |
+| <a name="output_tenant1_vpc_cidr_block"></a> [tenant1\_vpc\_cidr\_block](#output\_tenant1\_vpc\_cidr\_block) | The CIDR block for the Tenant 1 VPC. |
+| <a name="output_tenant1_vpc_private_subnet_ids"></a> [tenant1\_vpc\_private\_subnet\_ids](#output\_tenant1\_vpc\_private\_subnet\_ids) | List of IDs for the private subnets within the Tenant 1 VPC. |
+| <a name="output_tenant2_vpc_cidr_block"></a> [tenant2\_vpc\_cidr\_block](#output\_tenant2\_vpc\_cidr\_block) | The CIDR block for the Tenant 2 VPC. |
+<!-- END_TF_DOCS -->

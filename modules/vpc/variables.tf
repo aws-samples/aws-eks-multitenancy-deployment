@@ -1,88 +1,89 @@
-## ENV 
 variable "environment" {
   type        = string
-  description = "Deployment Environment"
+  description = "Specifies the deployment environment (e.g., dev, staging, prod)."
   default     = ""
 }
+
 variable "region" {
   type        = string
-  description = "AWS Deployment region."
+  description = "AWS region where the resources will be deployed."
   default     = ""
 }
-## VPC VARIABLES
+
 variable "vpc_cidr" {
   type        = string
-  description = "CIDR block of the vpc"
+  description = "CIDR block for the VPC to define the IP address range."
   default     = ""
 }
 
 variable "public_subnets_cidr" {
   type        = list(any)
-  description = "CIDR block for Public Subnet"
+  description = "List of CIDR blocks for public subnets within the VPC."
   default     = []
 }
 
 variable "private_subnets_cidr" {
   type        = list(any)
-  description = "CIDR block for Private Subnet"
+  description = "List of CIDR blocks for private subnets within the VPC."
   default     = []
 }
+
 variable "availability_zones" {
   type        = list(any)
-  description = "AZ in which all the resources will be deployed"
+  description = "List of Availability Zones for resource deployment."
   default     = []
 }
 
 variable "tags" {
   type        = map(any)
-  description = "Tags for VPC"
+  description = "A map of tags to assign to the VPC and its sub-resources."
   default     = {}
 }
 
 variable "name" {
   type        = string
-  description = "Subnets Tag VPC Prefix"
+  description = "Prefix for naming resources, used primarily for subnet naming."
   default     = ""
 }
 
 variable "enable_nat_gateway" {
   type        = bool
   default     = false
-  description = "Should be true if you want to provision NAT Gateways for each of your private networks"
+  description = "Set to true to provision NAT Gateways in the private subnets."
 }
 
 variable "tgw_public_routes" {
   type        = map(any)
-  description = "Transit Gateway public routes"
+  description = "A map of public routes for the Transit Gateway."
   default     = {}
 }
 
 variable "transit_gateway_id" {
   type        = string
   default     = ""
-  description = "Transit Gateway ID"
+  description = "ID of the Transit Gateway to be used."
 }
 
 variable "create_private_tgw_routes" {
   type        = bool
   default     = false
-  description = "Create TGW routes in private route table"
+  description = "Set to true to create Transit Gateway routes in private route tables."
 }
 
 variable "create_public_tgw_routes" {
   type        = bool
   default     = false
-  description = "Create TGW routes in public route table"
+  description = "Set to true to create Transit Gateway routes in public route tables."
 }
 
 variable "vpc_name" {
   type        = string
   default     = ""
-  description = "VPC name for flow log prefix"
+  description = "Name of the VPC, used as a prefix for VPC flow logs."
 }
 
 variable "enable_vpc_flow_logs" {
   type        = bool
   default     = false
-  description = "Whether to enable or disable vpc flow logs"
+  description = "Set to true to enable VPC flow logs."
 }
