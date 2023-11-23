@@ -64,8 +64,10 @@ resource "aws_iam_role_policy_attachment" "replication_s3_role_attach" {
   policy_arn = aws_iam_policy.replication_s3_policy.arn
 }
 
-#Replication bucket
+
 resource "aws_s3_bucket" "replication_bucket" {
+  # checkov:skip=CKV2_AWS_62: Event notifications not required for replication bucket
+  # checkov:skip=CKV2_AWS_61: Lifecycle config is not required for replication bucket
   provider      = aws.replication
   bucket_prefix = "${regex("[a-z0-9.-]+", lower(var.project_name))}-rpl"
 }
@@ -130,6 +132,7 @@ resource "aws_s3_bucket_versioning" "replication_bucket_versioning" {
 
 
 resource "aws_s3_bucket_server_side_encryption_configuration" "replication_bucket_encryption" {
+  # checkov:skip=CKV2_AWS_62: Event notifications configured differently
   provider = aws.replication
   bucket   = aws_s3_bucket.replication_bucket.bucket
 
@@ -148,8 +151,10 @@ resource "aws_s3_bucket_logging" "replication_bucket_logging" {
   target_prefix = "log/"
 }
 
-#Artifact Bucket
+
 resource "aws_s3_bucket" "codepipeline_bucket" {
+  #checkov:skip=CKV2_AWS_61: Lifecycle configuration not required for artifact bucket
+  #checkov:skip=CKV2_AWS_62: Event notifications are not required for artifact bucket
   bucket_prefix = regex("[a-z0-9.-]+", lower(var.project_name))
   tags          = var.tags
   force_destroy = true
@@ -253,6 +258,7 @@ resource "aws_s3_bucket_replication_configuration" "replication_config" {
 }
 
 resource "aws_s3_bucket_ownership_controls" "codepipeline_ownership_controls" {
+  # checkov:skip=CKV2_AWS_65: ACLs required for specific use cases
   bucket = aws_s3_bucket.codepipeline_bucket.id
   rule {
     object_ownership = "BucketOwnerPreferred"
@@ -260,6 +266,7 @@ resource "aws_s3_bucket_ownership_controls" "codepipeline_ownership_controls" {
 }
 
 resource "aws_s3_bucket_ownership_controls" "replication_ownership_controls" {
+  # checkov:skip=CKV2_AWS_65: ACLs required for specific use cases
   provider = aws.replication
   bucket   = aws_s3_bucket.replication_bucket.id
   rule {

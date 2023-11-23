@@ -10,9 +10,10 @@ resource "aws_codebuild_project" "terraform_codebuild_project" {
     type = var.build_project_source
   }
   environment {
-    compute_type                = var.builder_compute_type
-    image                       = var.builder_image
-    type                        = var.builder_type
+    compute_type = var.builder_compute_type
+    image        = var.builder_image
+    type         = var.builder_type
+    # checkov:skip=CKV_AWS_316: Privileged mode necessary for this project
     privileged_mode             = true
     image_pull_credentials_type = var.builder_image_pull_credentials_type
   }

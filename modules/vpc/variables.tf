@@ -74,3 +74,15 @@ variable "create_public_tgw_routes" {
   default     = false
   description = "Create TGW routes in public route table"
 }
+
+variable "vpc_name" {
+  type        = string
+  default     = ""
+  description = "VPC name for flow log prefix"
+}
+
+variable "enable_vpc_flow_logs" {
+  type        = bool
+  default     = false
+  description = "Whether to enable or disable vpc flow logs"
+}

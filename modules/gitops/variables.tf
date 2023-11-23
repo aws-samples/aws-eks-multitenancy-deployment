@@ -39,3 +39,8 @@ variable "cluster_name" {
   type        = string
   default     = ""
 }
+
+variable "repo_approvers_arn" {
+  description = "ARN or ARN pattern for the IAM User/Role/Group etc that can be used for approving Pull Requests"
+  type        = string
+}

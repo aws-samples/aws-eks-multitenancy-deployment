@@ -4,6 +4,7 @@ locals {
   backend_bucket_name       = "container-focus-group-tfstate"
   cluster_name              = format("%s-%s-eks-private", var.environment, local.region)
   cluster_version           = "1.26"
+  repo_approvers_arn        = "arn:aws:sts::${local.account_id}:assumed-role/CodeCommitReview/*" #Update ARN (IAM Role/User/Group) of Approval Members
   cluster_enabled_log_types = ["audit", "api", "authenticator", "scheduler", "controllerManager"]
   kms_key_administrators    = ["arn:aws:iam::${local.account_id}:role/Admin", "arn:aws:iam::${local.account_id}:role/container-focus-group-role", data.terraform_remote_state.pipeline.outputs.iam_arn]
   kms_key_owners            = ["arn:aws:iam::${local.account_id}:role/Admin", "arn:aws:iam::${local.account_id}:role/container-focus-group-role", data.terraform_remote_state.pipeline.outputs.iam_arn]
@@ -69,8 +70,10 @@ locals {
     }
   }
 
+  # checkov:skip=CKV_SECRET_6: High entropy string not a secret
   cluster_secretstore_name = "cluster-secretstore-sm"
-  cluster_secretstore_sa   = "external-secrets-sa"
+  # checkov:skip=CKV_SECRET_6: High entropy string not a secret
+  cluster_secretstore_sa = "external-secrets-sa"
 
   tags = {
     Name        = local.cluster_name

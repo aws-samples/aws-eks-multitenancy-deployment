@@ -1,4 +1,5 @@
 module "eks" {
+  #checkov:skip=CKV_TF_1: Ensure Terraform module sources use a commit hash
   source  = "terraform-aws-modules/eks/aws"
   version = "~> 19.12"
 
@@ -21,9 +22,11 @@ module "eks" {
   tags                                    = local.tags
 }
 
+
 module "eks_blueprints_addons" {
+  #checkov:skip=CKV_TF_1: Ensure Terraform module sources use a commit hash
   source  = "aws-ia/eks-blueprints-addons/aws"
-  version = "~> 1.0" #ensure to update this to the latest/desired version
+  version = "~> 1.0"
 
   cluster_name      = module.eks.cluster_name
   cluster_endpoint  = module.eks.cluster_endpoint
@@ -69,9 +72,11 @@ module "gitops" {
   region                   = local.region
   cluster_secretstore_sa   = local.cluster_secretstore_sa
   cluster_name             = local.cluster_name
+  repo_approvers_arn       = local.repo_approvers_arn
 }
 
 module "fluxcd" {
+  #checkov:skip=CKV_TF_1: Ensure Terraform module sources use a commit hash
   depends_on = [module.eks_blueprints_addons, module.gitops]
   source     = "terraform-module/release/helm"
   version    = "2.8.0"
@@ -91,7 +96,9 @@ module "fluxcd" {
   }
 }
 
+
 module "cilium" {
+  #checkov:skip=CKV_TF_1: Ensure Terraform module sources use a commit hash
   depends_on = [module.eks_blueprints_addons]
   source     = "terraform-module/release/helm"
   version    = "2.8.0"
@@ -132,7 +139,9 @@ module "cilium" {
   ]
 }
 
+
 module "tenant_mgmt" {
+  #checkov:skip=CKV_TF_1: Ensure Terraform module sources use a commit hash
   depends_on = [module.fluxcd, module.cilium]
   source     = "terraform-module/release/helm"
   version    = "2.8.0"

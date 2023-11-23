@@ -8,6 +8,8 @@ module "tenant_vpc1" {
   name                      = local.tenant1_vpc_name
   create_private_tgw_routes = true
   transit_gateway_id        = module.tgw.ec2_transit_gateway_id
+  enable_vpc_flow_logs      = true
+  vpc_name                  = local.tenant1_vpc_name
   tags = {
     Name        = local.tenant1_vpc_name
     Environment = var.environment
@@ -25,6 +27,8 @@ module "tenant_vpc2" {
   name                      = local.tenant2_vpc_name
   create_private_tgw_routes = true
   transit_gateway_id        = module.tgw.ec2_transit_gateway_id
+  enable_vpc_flow_logs      = true
+  vpc_name                  = local.tenant2_vpc_name
   tags = {
     Name        = local.tenant2_vpc_name
     Environment = var.environment
@@ -42,6 +46,8 @@ module "eks_vpc" {
   name                      = local.eks_vpc_name
   create_private_tgw_routes = true
   transit_gateway_id        = module.tgw.ec2_transit_gateway_id
+  enable_vpc_flow_logs      = true
+  vpc_name                  = local.eks_vpc_name
   tags = {
     Name        = local.eks_vpc_name
     Environment = var.environment
@@ -60,6 +66,8 @@ module "eks_egress_vpc" {
   name                     = local.eks_egress_vpc_name
   enable_nat_gateway       = true
   transit_gateway_id       = module.tgw.ec2_transit_gateway_id
+  enable_vpc_flow_logs     = true
+  vpc_name                 = local.eks_egress_vpc_name
   create_public_tgw_routes = true
   tgw_public_routes = {
     tenant1_vpc = {
@@ -89,7 +97,7 @@ module "tgw" {
   name        = local.tgw_name
   description = "My TGW shared with Mutliple VPC"
   # When "true" there is no need for RAM resources if using multiple AWS accounts
-  enable_auto_accept_shared_attachments = true
+  enable_auto_accept_shared_attachments = false
 
   timeouts = {
     create = "10m" # Increase the create timeout to 10 minutes
