@@ -1,3 +1,4 @@
+
 # EKS Multi-Tenancy Terraform Solution
 
 This repository contains the Terraform modules to deploy infrastructure for EKS multi-tenancy.
@@ -39,14 +40,10 @@ This project simplifies infrastructure provisioning for AWS EKS multi-tenancy us
 
 ## Bootstrap Backend S3 and DynamoDB
 
-To store the Terraform state in an S3 bucket and lock the state using DynamoDB, you need to create an S3 bucket and a DynamoDB table.
+To store the Terraform state in an S3 bucket and lock the state using DynamoDB, use the provided script in the `bootstrap` directory. This script creates the necessary S3 bucket and DynamoDB table. Run the following command from the `bootstrap` directory:
 
-Navigate to the `bootstrap` directory, update the `main.tf` with the desired bucket name and DynamoDB table name, then run the following commands:
-
-```
-terraform init
-terraform plan 
-terraform apply
+```sh
+./bootstrap.sh
 ```
 
 ## Deployment Order
@@ -59,7 +56,7 @@ Modules must be deployed in the order listed below. Note that the Pipeline modul
 
 ## Deployment Instructions
 
-Use the run.sh script in the root directory to deploy any module to any environment. Remember, only the pipeline module should be built using the script with the arguments below. The network and compute modules will be built through CodePipeline.
+Use the `run.sh` script in the root directory to deploy any module to any environment. Remember, only the pipeline module should be built using the script with the arguments below. The network and compute modules will be built through CodePipeline.
 
 ```
 ./run.sh -m pipeline -env demo -region us-west-2 -tfcmd init
@@ -77,10 +74,10 @@ Once the CodePipeline successfully deploys, you will have the following AWS reso
 - Stages in CodePipeline
 
 ## The CodePipeline consists of these stages:
-- Stage-validate: Initializes Terraform, runs security scans using checkov and tfsec tools, and uploads scan - reports to the S3 bucket.
+- Stage-validate: Initializes Terraform, runs security scans using checkov and tfsec tools, and uploads scan reports to the S3 bucket.
 - Stage-plan: Displays the Terraform plan and uploads the plan to the S3 bucket.
 - Stage-apply: Applies the Terraform plan output from the S3 and establishes AWS services.
-- Stage-destroy: A manual step used to remove all AWS services previously created.(This stage is not enabled by default, if need to create destory stage in CodePipeline, update `enable_destroy_stage` to true)
+- Stage-destroy: A manual step used to remove all AWS services previously created. (This stage is not enabled by default, if need to create destroy stage in CodePipeline, update `enable_destroy_stage` to true)
 
 ## Troubleshooting
 
@@ -88,10 +85,10 @@ Once the CodePipeline successfully deploys, you will have the following AWS reso
 
 If you encounter an error message similar to the one below:
 
-\```
+```
   Failed to checkout and determine revision: unable to clone
   unknown error: You have successfully authenticated over SSH. You can use Git to interact with AWS CodeCommit.
-\```
+```
 
 Follow the troubleshooting steps below:
 
