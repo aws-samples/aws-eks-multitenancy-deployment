@@ -108,3 +108,11 @@ Follow the troubleshooting steps below:
      ```
 
 3. **Recheck the Status**: After executing the above steps, use the `kubectl get gitrepositories -A` command to check if the issue persists. If it does, consider diving deeper into the Flux logs for more details or refer back to the general troubleshooting guide.
+
+
+
+Contributors:
+1. Aditya Ambati
+2. Aniket Dekate
+3. Nadeem Rahaman
+
