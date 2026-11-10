@@ -17,7 +17,9 @@ phases:
       - set -e
       # Install Terraform
       - "echo Installing Terraform..."
-      - "curl -s -qL -o terraform.zip https://releases.hashicorp.com/terraform/${TF_VERSION}/terraform_${TF_VERSION}_linux_amd64.zip"
+      - "curl -sSfL -o terraform.zip https://releases.hashicorp.com/terraform/${TF_VERSION}/terraform_${TF_VERSION}_linux_amd64.zip"
+      - "curl -sSfL -o terraform_SHA256SUMS https://releases.hashicorp.com/terraform/${TF_VERSION}/terraform_${TF_VERSION}_SHA256SUMS"
+      - "grep \"terraform_${TF_VERSION}_linux_amd64.zip\" terraform_SHA256SUMS | sed 's/terraform_.*_linux_amd64.zip/terraform.zip/' | sha256sum -c -"
       - "unzip -o terraform.zip"
       - "mv terraform /bin"
       - "rm terraform.zip"
