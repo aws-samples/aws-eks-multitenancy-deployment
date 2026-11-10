@@ -1,7 +1,7 @@
 locals {
   region                    = data.aws_region.current.name
   account_id                = data.aws_caller_identity.current.account_id
-  backend_bucket_name       = "container-focus-group-tfstate"
+  backend_bucket_name       = var.backend_bucket_name
   cluster_name              = format("%s-%s-eks-private", var.environment, local.region)
   cluster_version           = "1.26"
   repo_approvers_arn        = "arn:aws:sts::${local.account_id}:assumed-role/CodeCommitReview/*" #Update ARN (IAM Role/User/Group) of Approval Members
