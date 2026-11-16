@@ -13,8 +13,8 @@ resource "aws_codebuild_project" "terraform_codebuild_project" {
     compute_type = var.builder_compute_type
     image        = var.builder_image
     type         = var.builder_type
-    # checkov:skip=CKV_AWS_316: Privileged mode necessary for this project
-    privileged_mode             = true
+    # Terraform builds do not need Docker daemon access (CKV_AWS_316)
+    privileged_mode             = false
     image_pull_credentials_type = var.builder_image_pull_credentials_type
   }
   logs_config {

@@ -17,35 +17,39 @@ echo "Terraform checkov  : ${tfCheckov}"
 echo "Terraform tfsec    : ${tfTfsec}"
 echo "------------------------"
 terraform init
-if (( ${tfValidate} == "Y"))
-then
+
+tfValidateOutput=0
+tfFormatOutput=0
+tfCheckovOutput=0
+tfTfsecOutput=0
+
+if [[ "${tfValidate}" == "Y" ]]; then
     echo "## VALIDATION : Validating Terraform code ..."
     terraform validate
+    tfValidateOutput=$?
 fi
-tfValidateOutput=$?
 
-if (( ${tfFormat} == "Y"))
-then
-    echo "## VALIDATION : Formatting Terraform code ..."
-    terraform fmt -recursive
+if [[ "${tfFormat}" == "Y" ]]; then
+    echo "## VALIDATION : Checking Terraform formatting ..."
+    terraform fmt -recursive -check
+    tfFormatOutput=$?
 fi
-tfFormatOutput=$?
 
-if (( ${tfCheckov} == "Y"))
-then
+if [[ "${tfCheckov}" == "Y" ]]; then
     echo "## VALIDATION : Running checkov ..."
-    #checkov -s -d .
     checkov -o junitxml --framework terraform -d ./ >checkov.xml
+    tfCheckovOutput=$?
+else
+    touch checkov.xml
 fi
-tfCheckovOutput=$?
 
-if (( ${tfTfsec} == "Y"))
-then
+if [[ "${tfTfsec}" == "Y" ]]; then
     echo "## VALIDATION : Running tfsec ..."
-    #tfsec .
     tfsec ./ --format junit --out tfsec-junit.xml
+    tfTfsecOutput=$?
+else
+    touch tfsec-junit.xml
 fi
-tfTfsecOutput=$?
 
 echo "## VALIDATION Summary ##"
 echo "------------------------"
@@ -55,15 +59,13 @@ echo "Terraform checkov  : ${tfCheckovOutput}"
 echo "Terraform tfsec    : ${tfTfsecOutput}"
 echo "------------------------"
 
-if (( ${SKIPVALIDATIONFAILURE} == "Y" ))
-then
-  #if SKIPVALIDATIONFAILURE is set as Y, then validation failures are skipped during execution
-  echo "## VALIDATION : Skipping validation failure checks..."
-elif (( $tfValidateOutput == 0 && $tfFormatOutput == 0 && $tfCheckovOutput == 0  && $tfTfsecOutput == 0 ))
-then
-  echo "## VALIDATION : Checks Passed!!!"
+if [[ "${SKIPVALIDATIONFAILURE}" == "Y" ]]; then
+    # If SKIPVALIDATIONFAILURE is set to Y, validation failures are reported but do not stop the build.
+    echo "## WARNING : Skipping validation failure checks. Do not use this setting outside testing."
+elif (( tfValidateOutput == 0 && tfFormatOutput == 0 && tfCheckovOutput == 0 && tfTfsecOutput == 0 )); then
+    echo "## VALIDATION : Checks Passed!!!"
 else
-  # When validation checks fails, build process is halted.
-  echo "## ERROR : Validation Failed"
-  exit 1;
+    # When validation checks fail, the build process is halted.
+    echo "## ERROR : Validation Failed"
+    exit 1
 fi

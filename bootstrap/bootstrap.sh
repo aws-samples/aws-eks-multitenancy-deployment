@@ -1,12 +1,21 @@
 #!/bin/bash
 
 # Variables
-S3_BUCKET_NAME="container-focus-group-tfstate"
-DYNAMODB_TABLE_NAME="terraform-locks"
-REGION="us-west-2"
+# Override any of these by exporting them before running the script.
+REGION="${AWS_REGION:-us-west-2}"
+ACCOUNT_ID="$(aws sts get-caller-identity --query Account --output text)"
+# Bucket names are globally unique; include account ID and Region to avoid name squatting.
+S3_BUCKET_NAME="${TF_STATE_BUCKET:-amzn-s3-demo-tfstate-${ACCOUNT_ID}-${REGION}}"
+DYNAMODB_TABLE_NAME="${TF_LOCK_TABLE:-terraform-locks}"
+
+set -euo pipefail
 
 # Create S3 Bucket
-aws s3 mb "s3://${S3_BUCKET_NAME}" --region ${REGION}
+aws s3 mb "s3://${S3_BUCKET_NAME}" --region "${REGION}"
+
+# Block all public access on the state bucket
+aws s3api put-public-access-block --bucket "${S3_BUCKET_NAME}" \
+    --public-access-block-configuration BlockPublicAcls=true,IgnorePublicAcls=true,BlockPublicPolicy=true,RestrictPublicBuckets=true
 
 # Enable Versioning on the S3 Bucket
 aws s3api put-bucket-versioning --bucket ${S3_BUCKET_NAME} --versioning-configuration Status=Enabled
@@ -29,4 +38,5 @@ aws dynamodb create-table \
 echo "Checking if DynamoDB table is created..."
 aws dynamodb describe-table --table-name ${DYNAMODB_TABLE_NAME} --region ${REGION}
 
-echo "S3 bucket and DynamoDB table created successfully."
+echo "S3 bucket ${S3_BUCKET_NAME} and DynamoDB table ${DYNAMODB_TABLE_NAME} created successfully."
+echo "Export TF_STATE_BUCKET=${S3_BUCKET_NAME} before running run.sh if you overrode the default name."

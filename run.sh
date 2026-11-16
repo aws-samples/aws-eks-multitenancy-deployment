@@ -5,8 +5,10 @@
 ################################################################################
 
 RED='\033[0;31m'
-BACKEND_BUCKET_ID="container-focus-group-tfstate"
-DYNAMODB_ID="terraform-locks"
+# State bucket and lock table must match the values used in bootstrap/bootstrap.sh.
+# Defaults are derived after the Region is parsed; override with TF_STATE_BUCKET / TF_LOCK_TABLE.
+BACKEND_BUCKET_ID="${TF_STATE_BUCKET:-}"
+DYNAMODB_ID="${TF_LOCK_TABLE:-terraform-locks}"
 
 ################################################################################
 # Functions
@@ -85,6 +87,12 @@ fi
 # Set provider region and environment variable
 export AWS_REGION="$TF_REGION"
 export TF_VAR_environment="$TF_ENV"
+
+if [ -z "$BACKEND_BUCKET_ID" ]; then
+    ACCOUNT_ID="$(aws sts get-caller-identity --query Account --output text)"
+    BACKEND_BUCKET_ID="amzn-s3-demo-tfstate-${ACCOUNT_ID}-${TF_REGION}"
+fi
+export TF_VAR_backend_bucket_name="$BACKEND_BUCKET_ID"
 
 if [ "$TF_CMD" == "init" ]; then
     terraform -chdir=$TF_EXECUTION_DIR init \

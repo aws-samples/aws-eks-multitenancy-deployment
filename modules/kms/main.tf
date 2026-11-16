@@ -15,28 +15,17 @@ data "aws_iam_policy_document" "kms_key_policy_doc" {
     sid     = "Enable IAM User Permissions"
     effect  = "Allow"
     actions = ["kms:*"]
-    #checkov:skip=CKV_AWS_111:Without this statement, KMS key cannot be managed by root
-    #checkov:skip=CKV_AWS_109:Without this statement, KMS key cannot be managed by root
-    #checkov:skip=CKV_AWS_356:Without this statement, KMS key cannot be managed by root
+    # Default key policy statement recommended by AWS KMS. It delegates access control to IAM
+    # in this account and prevents the key from becoming unmanageable. In a key policy,
+    # resources = ["*"] refers only to this key.
+    #checkov:skip=CKV_AWS_111:Default KMS key policy root statement; required so the key stays manageable
+    #checkov:skip=CKV_AWS_109:Default KMS key policy root statement; required so the key stays manageable
+    #checkov:skip=CKV_AWS_356:In a key policy, "*" refers only to this key
     resources = ["*"]
 
     principals {
       type        = "AWS"
       identifiers = ["arn:aws:iam::${local.account_id}:root"]
-    }
-  }
-
-  statement {
-    sid       = "Allow access for Key Administrators"
-    effect    = "Allow"
-    actions   = ["kms:*"]
-    resources = ["*"]
-
-    principals {
-      type = "AWS"
-      identifiers = [
-        var.codepipeline_role_arn
-      ]
     }
   }
 

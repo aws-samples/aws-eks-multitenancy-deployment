@@ -9,12 +9,13 @@ env:
     TF_MODULE_TO_BUILD: "network"
     TF_VERSION: "1.4.6"
     ENVIRONMENT: "demo"
-    SKIPVALIDATIONFAILURE: "Y"
-    ENABLE_TFVALIDATE: "N"
+    SKIPVALIDATIONFAILURE: "N"
+    ENABLE_TFVALIDATE: "Y"
     ENABLE_TFFORMAT: "Y"
-    ENABLE_TFCHECKOV: "N"
-    ENABLE_TFSEC: "N"
+    ENABLE_TFCHECKOV: "Y"
+    ENABLE_TFSEC: "Y"
     TFSEC_VERSION: "v1.28.1"
+    CHECKOV_VERSION: "3.2.255"
 
 phases:
   install:
@@ -25,17 +26,21 @@ phases:
       - set -e
       # Install Terraform
       - "echo Installing Terraform..."
-      - "curl -s -qL -o terraform.zip https://releases.hashicorp.com/terraform/${TF_VERSION}/terraform_${TF_VERSION}_linux_amd64.zip"
+      - "curl -sSfL -o terraform.zip https://releases.hashicorp.com/terraform/${TF_VERSION}/terraform_${TF_VERSION}_linux_amd64.zip"
+      - "curl -sSfL -o terraform_SHA256SUMS https://releases.hashicorp.com/terraform/${TF_VERSION}/terraform_${TF_VERSION}_SHA256SUMS"
+      - "grep \"terraform_${TF_VERSION}_linux_amd64.zip\" terraform_SHA256SUMS | sed 's/terraform_.*_linux_amd64.zip/terraform.zip/' | sha256sum -c -"
       - "unzip -o terraform.zip"
       - "mv terraform /bin"
       - "rm terraform.zip"
 
       # Install necessary utilities
       - "yum install -y curl jq awscli"
-      - "pip3 install checkov"
+      - "pip3 install checkov==${CHECKOV_VERSION}"
       
       # Install TFSec
-      - "wget -q -O tfsec https://github.com/aquasecurity/tfsec/releases/download/${TFSEC_VERSION}/tfsec-linux-amd64"
+      - "curl -sSfL -o tfsec https://github.com/aquasecurity/tfsec/releases/download/${TFSEC_VERSION}/tfsec-linux-amd64"
+      - "curl -sSfL -o tfsec_checksums.txt https://github.com/aquasecurity/tfsec/releases/download/${TFSEC_VERSION}/tfsec_checksums.txt"
+      - "grep ' tfsec-linux-amd64$' tfsec_checksums.txt | sed 's/tfsec-linux-amd64/tfsec/' | sha256sum -c -"
       - "chmod +x ./tfsec"
       - "mv ./tfsec /usr/local/bin/tfsec"
 
